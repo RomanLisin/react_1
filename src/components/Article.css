@@ -1,11 +1,11 @@
 article
 {
- background-color: #c8c8c8;
+ background-color: #C8C8C8;
  color: #323232;
     /* min-height: 37.8vh; */
 }
-p
+article p
 {
     margin: 0;
-    padding: 2vh;
+    padding: 10px;
 }
