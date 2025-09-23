@@ -8,6 +8,7 @@ function Article(props)
   const {title, content, functionType, showCalculation = true} = props;
   const [result, setResult] = useState(null);
   const [inputValues, setInputValues] = useState({});
+  const [conversionType, setConversionType] = useState('decToBin'); // по умолчанию decToBin
 
   //factorial
   const calculateFactorial = (n) => {
@@ -22,12 +23,81 @@ function Article(props)
 
   //power
   const calculatePower = (base, exponent) => {
-      return base ** exponent;
+      //return base ** exponent;
+      return Math.pow(base, exponent);
   };
 
   //systemnumbers
-  const convertNumberSystem = (number, fromBase, toBase) => {
-      return number * fromBase * toBase;
+  // const convertNumberSystem = (number, fromBase, toBase) => {
+  //   try{
+  //   const decimal = parseInt(number, fromBase);
+
+  //   if (isNaN(decimal)) {
+  //     return 'Error number'
+  //   }
+  //   return decimal.toString(toBase).toUpperCase();
+  // }catch (error) {
+  //   return 'Error conversation'
+  // }
+  // };
+const convertDecimalToBinary = (decimalNumber) => {
+    try {
+        const number = parseInt(decimalNumber);
+        
+        if (isNaN(number)) {
+            return 'Error: Please enter a valid number.';
+        }
+        
+        if (number < 0) {
+            return 'Error: Please enter a non-negative number.';
+        }
+        
+        return number.toString(2);
+        
+    } catch (error) {
+        return 'Error conver';
+    }
+};
+const convertDecimalToHexadecimal = (decimalNumber) => {
+    try {
+        const number = parseInt(decimalNumber);
+        
+        if (isNaN(number)) {
+            return 'Error: Please enter a valid number.';
+        }
+        
+        if (number < 0) {
+            return 'Error: Please enter a non-negative number.';
+        }
+        
+        return number.toString(16).toUpperCase();
+        
+    } catch (error) {
+        return 'Error conversion';
+    }
+};
+const convertBinaryToDecimal = (binaryNumber) => {
+    try {
+      // проверяем, что строка содержит только 0 и 1
+      if (!/^[01]+$/.test(binaryNumber)) {
+        return 'Error: Please enter a valid binary number (0 and 1 only)';
+      }
+      return parseInt(binaryNumber, 2);
+    } catch (error) {
+      return 'Error conversion';
+    }
+  };
+
+  const convertHexadecimalToDecimal = (hexNumber) => {
+    try {
+      // проверяем, что строка содержит допустимые hex-символы
+      if (!/^[0-9A-Fa-f]+$/.test(hexNumber)) {
+        return 'Error: Please enter a valid hexadecimal number.';
+      }
+      return parseInt(hexNumber, 16);
+    } catch (error) {
+      return 'Error conversion';
+    }
   };
 
   const handleCalculate = () => {
@@ -51,10 +121,23 @@ function Article(props)
         break;
 
       case 'numberSystem':
-        const number = inputValues.param1 || '0';
-        const fromBase =parseInt(inputValues.param2 || 0);
-        const toBase = parseInt(inputValues.param3 || 0);
-        calculationResult = convertNumberSystem(number, fromBase, toBase);
+        switch (conversionType) {
+
+          case 'decToBin':
+            calculationResult = convertDecimalToBinary(inputValues.param1 || '0');
+            break;
+          case 'decToHex':
+             calculationResult = convertDecimalToHexadecimal(inputValues.number || '0');
+            break;
+          case 'binToDec':
+            calculationResult = convertBinaryToDecimal(inputValues.number || '0');
+            break;
+          case 'hexToDec':
+            calculationResult = convertHexadecimalToDecimal(inputValues.number || '0');
+            break;
+          default:
+            calculationResult = "Choose type of conversion"
+        }
         break;
       
       default:
@@ -70,6 +153,12 @@ function Article(props)
       ...prev,
       [paramName]:value
     }));
+  };
+
+  const handleConversionTypeChange = (type) => {
+    setConversionType(type);
+    setInputValues(prev => ({ ...prev, number: '' }));
+    setResult(null);
   };
 
 // рендеринг полей в зависимости от типа функций
@@ -115,49 +204,98 @@ const renderInputFields = () => {
 
             </>
             );
-          case 'numberSytem':
+          case 'numberSystem':
             return(
           <>
-          <div className='input-group'>
-            <label>Number:</label>
-            <input 
-            type="number" 
-            value={inputValues.param1 || ''}
-            onChange={(e)=> handleInputChange('param1', e.target.value)}
-            placeholder='Input base number'
-            />
-          </div>
-          <div className='input-group'>
-            <label>From number system:</label>
-            <input 
-            type="number" 
-            min="2"
-            max="36"
-            value={inputValues.param2 || ''}
-            onChange={(e)=> handleInputChange('param2', e.target.value)}
-            placeholder='Input exponent number'
-            />
-          </div>
-          
-          <div className='input-group'>
-            <label>To numer system:</label>
-            <input 
-            type="number" 
-            min="2"
-            max="36"
-            value={inputValues.param3 || ''}
-            onChange={(e)=> handleInputChange('param3', e.target.value)}
-            placeholder='Input exponent number'
-            />
-          </div>
-    
+           <div className="conversion-types">
+              <h4>Select conversion type:</h4>
+              <div className="conversion-group">
+                <label className="conversion-label">
+                  <input
+                    type="radio"
+                    name="conversionType"
+                    value="decToBin"
+                    checked={conversionType === 'decToBin'}
+                    onChange={(e) => handleConversionTypeChange(e.target.value)}
+                  />
+                  <span>10 - 2</span>
+                </label>
+                
+                <label className="conversion-label">
+                  <input
+                    type="radio"
+                    name="conversionType"
+                    value="decToHex"
+                    checked={conversionType === 'decToHex'}
+                    onChange={(e) => handleConversionTypeChange(e.target.value)}
+                  />
+                  <span>10 - 16</span>
+                </label>
+                
+                <label className="conversion-label">
+                  <input
+                    type="radio"
+                    name="conversionType"
+                    value="binToDec"
+                    checked={conversionType === 'binToDec'}
+                    onChange={(e) => handleConversionTypeChange(e.target.value)}
+                  />
+                  <span>2 - 10</span>
+                </label>
+                
+                <label className="conversion-label">
+                  <input
+                    type="radio"
+                    name="conversionType"
+                    value="hexToDec"
+                    checked={conversionType === 'hexToDec'}
+                    onChange={(e) => handleConversionTypeChange(e.target.value)}
+                  />
+                  <span> 16 - 10</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label>
+                {conversionType === 'decToBin' || conversionType === 'decToHex' 
+                  ? 'Decimal number:' 
+                  : conversionType === 'binToDec' 
+                    ? 'Binary number:' 
+                    : 'Hexadecimal number:'}
+              </label>
+              <input
+                type={conversionType === 'decToBin' || conversionType === 'decToHex' ? 'number' : 'text'}
+                value={inputValues.number || ''}
+                onChange={(e) => handleInputChange('number', e.target.value)}
+                placeholder={
+                  conversionType === 'decToBin' || conversionType === 'decToHex' 
+                    ? 'Input decimal number' 
+                    : conversionType === 'binToDec' 
+                      ? 'Input binary number (0 и 1)' 
+                      : 'Input hexadecimal number'
+                }
+                className="number-input"
+              />
+            </div>
+            
           </>
          );
           default:
-            return <div>Неизвестный тип функции: {functionType}</div>;
+            // return <div>Неизвестный тип функции: {functionType}</div>;
+            return null;
           }
         };
-        
+// текст кнопки в зависимости от функции
+  const getButtonText = () => {
+    switch (functionType) {
+      case 'factorial': return 'Calculate factorial';
+      case 'power': return 'Calculate power';
+      case 'numberSystem': return 'Convert';
+      default: return 'Calculate';
+    }
+  };
+
         return(
  <article className='article'>
         <h2>{title}</h2>
@@ -170,11 +308,11 @@ const renderInputFields = () => {
               {renderInputFields()}
             </div>
             <button onClick={handleCalculate} className='calculate-btn'>
-              Calculate
+              {getButtonText()}
             </button>
 
               {result !== null && (
-                <div>
+                <div className='result'>
                   <strong>Result:</strong> {result}
                 </div>
               )}
