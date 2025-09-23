@@ -1,8 +1,14 @@
 article
 {
- background-color: #C8C8C8;
- color: #323232;
+ /* background-color: #C8C8C8; */
+ /* color: #323232; */
     /* min-height: 37.8vh; */
+     background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 20px;
+  box-shadow: 0 5px 4px rgba(0, 0, 0, 0.1); 
+  border: 1px solid #313233; 
 }
 article p
 {
