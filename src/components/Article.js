@@ -5,14 +5,14 @@ import './Article.css';
 function Article(props)
 {
   // const {title, content} = props;
-  const {title, content, functionType, functionParams, showCalculation = true} = props;
+  const {title, content, functionType, showCalculation = true} = props;
   const [result, setResult] = useState(null);
   const [inputValues, setInputValues] = useState({});
 
   //factorial
   const calculateFactorial = (n) => {
     if(n<0) return '???';
-    if(n===0 || n===1) return 1;
+    if(n === 0 || n === 1) return 1;
     let factorial = 1;
     for(let i=2; i<=n; i++){
       factorial*=i;
@@ -31,7 +31,10 @@ function Article(props)
   };
 
   const handleCalculate = () => {
-    if(!functionType) return;
+    if(!functionType || typeof functionType !== 'string'){
+    setResult('Function undefined');
+      return;
+    }
 
     let calculationResult;
     
@@ -71,6 +74,8 @@ function Article(props)
 
 // рендеринг полей в зависимости от типа функций
 const renderInputFields = () => {
+  if (!functionType) return null;
+  
       switch (functionType){
         case 'factorial':
           return(
@@ -86,8 +91,8 @@ const renderInputFields = () => {
               />
             </div>
           );
-          break;
         case 'power':
+          return(
             <>
             <div className='input-group'>
               <label>Base number:</label>
@@ -109,9 +114,9 @@ const renderInputFields = () => {
             </div>
 
             </>
-          
-          break;
+            );
           case 'numberSytem':
+            return(
           <>
           <div className='input-group'>
             <label>Number:</label>
@@ -147,19 +152,36 @@ const renderInputFields = () => {
           </div>
     
           </>
-          
-          break;
+         );
           default:
-            return null;
+            return <div>Неизвестный тип функции: {functionType}</div>;
           }
         };
         
         return(
- <article>
+ <article className='article'>
         <h2>{title}</h2>
         <p>{content}</p>
+
+        {showCalculation && functionType && (
+          <div className='calculation-section'>
+            <h3>Calculator</h3>
+            <div className='input-fields'>
+              {renderInputFields()}
+            </div>
+            <button onClick={handleCalculate} className='calculate-btn'>
+              Calculate
+            </button>
+
+              {result !== null && (
+                <div>
+                  <strong>Result:</strong> {result}
+                </div>
+              )}
+          </div>
+        )}
       </article>
-    )
+    );
 }
 
 export default Article;
